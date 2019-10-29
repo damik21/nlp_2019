@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 # Parser for Pubmed Open-Access XML Subset and MEDLINE XML Dataset
 
 [![Join the chat at https://gitter.im/titipata/pubmed_parser](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/titipata/pubmed_parser?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -15,9 +19,7 @@ We provide example files in [`data`](data/) folder.
 [copyright notice](https://www.ncbi.nlm.nih.gov/pmc/about/copyright/#copy-PMC) because your IP
 can get blocked if you try to download in bulk.
 
-## Available Parsers
-
-Here are available parsers.
+## Parsers available
 
 #### Parse Pubmed OA XML information
 
@@ -67,7 +69,6 @@ Each dictionary has keys as follows
 - `journal_type`: type of journal
 - `pmid_cited`: Pubmed ID of article that article cites
 - `doi_cited`: DOI of article that article cites
-- `year`: Publication year as it appears in the reference (May include letter suffix, e.g. 2007a)
 
 ```python
 dicts_out = pp.parse_pubmed_references(path) # return list of dictionary
@@ -128,22 +129,20 @@ dicts_out = pp.parse_pubmed_table('data/medline16n0902.xml.gz', return_xml=False
 
 #### Parse Medline NML XML
 
-Medline NML XML has a different XML format than PubMed Open Access. 
-The structure of XML files can be found in MEDLINE/PubMed DTD [here](https://www.nlm.nih.gov/databases/dtd/).
+Medline NML XML has a different XML format than PubMed Open Access.
 You can use the function `parse_medline_xml` to parse that format.
 This function will return list of dictionaries, where each element contains:
 
 - `pmid`: Pubmed ID
 - `pmc`: Pubmed Central ID
-- `doi`: DOI
 - `other_id`: Other IDs found, each separated by `;`
 - `title`: title of the article
 - `abstract`: abstract of the article
+- `affiliation`: corresponding author's affiliation. If multiple, each separated by `\n` and will
+correspond to each authors
 - `authors`: authors, each separated by `;`
-- `mesh_terms`: list of MeSH terms with corresponding MeSH ID, each separated by `;` e.g. `'D000161:Acoustic Stimulation; D000328:Adult; ...`
-- `publication_types`: list of publication type list each separated by `;` e.g. `'D016428:Journal Article'`
+- `mesh_terms`: list of MeSH terms, each separated by `;`
 - `keywords`: list of keywords, each separated by `;`
-- `chemical_list`: list of chemical terms, each separated by `;`
 - `pubdate`: Publication date. Defaults to year information only.
 - `journal`: journal of the given paper
 - `medline_ta`: this is abbreviation of the journal name
@@ -155,15 +154,14 @@ XMLs for the same paper. You can delete the record of deleted paper
 because it got updated.
 
 ```python
-dicts_out = pp.parse_medline_xml('data/medline16n0902.xml.gz', 
-                                 year_info_only=False, 
-                                 nlm_category=False, author_list=False) # return list of dictionary
+dicts_out = pp.parse_medline_xml('data/medline16n0902.xml.gz') # return list of dictionary
 ```
 
-To extract month and day information from PubDate, set `year_info_only=True`.
-We also allow parsing structured abstract and we can control display of each
-section or label by changing `nlm_category` argument.
+Try to extract month and day information from PubDate as well:
 
+```python
+dicts_out = pp.parse_medline_xml('data/medline16n0902.xml.gz', year_info_only=False)  
+```
 
 #### Parse Medline Grant ID
 
@@ -191,7 +189,6 @@ get a dictionary with following keys
 - `affiliation`: affiliation of first author
 - `authors`: string of authors, separated by `;`
 - `year`: Publication year
-- `keywords`: keywords or MESH terms of the article
 
 ```python
 dict_out = pp.parse_xml_web(pmid, save_xml=False)
@@ -235,12 +232,24 @@ it will return `None`.
 
 ## Install package
 
-Clone the repository and install using `pip`.
+Clone the repository
 
 ```bash
 $ git clone https://github.com/titipata/pubmed_parser
-$ pip install ./pubmed_parser
 ```
+
+Install all dependencies
+
+```bash
+$ pip install -r requirements.txt
+```
+
+Then you can install the package as follows
+
+```bash
+$ python setup.py install
+```
+
 
 ## Example Usage for Pubmed OA
 
@@ -298,8 +307,8 @@ folder for more information.
 
 ## Members
 
-- [Titipat Achakulvisut](http://titipata.github.io)
-- [Daniel E. Acuna](http://scienceofscience.org/about)
+- [Titipat Achakulvisut](http://titipata.github.io), Northwestern University
+- [Daniel E. Acuna](http://scienceofscience.org/about), Rehabilitation Institute of Chicago and Northwestern University
 
 and [contributors](https://github.com/titipata/pubmed_parser/graphs/contributors)
 
@@ -320,10 +329,9 @@ http://doi.org/10.5281/zenodo.159504
 
 ## Acknowledgement
 
-Package is developed in [Konrad Kording's Lab](http://kordinglab.com/) at the University of Pennsylvania
+Package is developed in [Konrad Kording's Lab](http://kordinglab.com/) at Northwestern University
 
 
 ## License
 
-MIT License Copyright (c) 2015-2018 Titipat Achakulvisut, Daniel E. Acuna
-# nlp_2019
+MIT License Copyright (c) 2015, 2016 Titipat Achakulvisut, Daniel E. Acuna
