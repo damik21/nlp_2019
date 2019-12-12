@@ -1,4 +1,7 @@
 import json
+import os
+import pathlib
+
 from nltk.tokenize import word_tokenize
 from allennlp.commands.elmo import ElmoEmbedder
 
@@ -30,6 +33,10 @@ resources = [
     "made"
 ]
 
+output_path = "./output"
+if not os.path.exists(output_path):
+    pathlib.Path(output_path).mkdir(parents=True, exist_ok=True)
+
 for resource_name in resources:
     for file_type in ["test", "train"]:
         # все усреднённые векторы текущего файла
@@ -40,6 +47,7 @@ for resource_name in resources:
             for line in f:
                 # преобразовываем json-строку в словарь
                 relation_dict = json.loads(line)
+                label = relation_dict['label']
                 # количество слов в поле "middle_context" отношения
                 middle_context_count = len(relation_dict['middle_context']) if relation_dict['middle_context'] else 0
                 if middle_context_count == 0:
@@ -70,4 +78,7 @@ for resource_name in resources:
                         elements_sum += vector[i]
                     averaged_value = elements_sum / middle_context_count
                     averaged_vector.append(averaged_value)
-                averaged_vectors.append(averaged_vector)
+                averaged_vectors.append({"label": label, "averaged_vector": averaged_vector})
+
+        with open("%s/%s_%s.txt" % (output_path, resource_name, file_type), 'w') as f:
+            f.write(str(averaged_vectors))
